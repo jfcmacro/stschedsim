@@ -6,6 +6,7 @@ enum ProcessState { NEW, READY, RUNNING, TERMINATED };
 
 class Process {
 private:
+  static unsigned int nextId;
   unsigned int id;
   unsigned int arrive;
   unsigned int service;
@@ -15,14 +16,15 @@ private:
   unsigned int terminated;
   ProcessState state;
 public:
-  Process(unsigned int id,
-	  unsigned int arrive,
-	  unsigned int service) : id(id),
-			    arrive(arrive),
-			    service(service),
-			    execute(0),
-			    start(0),
-			    waiting(0) { }
+  Process(unsigned int arrive,
+	  unsigned int service) :
+    id(nextId++),
+    arrive(arrive),
+    service(service),
+    execute(0),
+    start(0),
+    waiting(0),
+    state(NEW) { }
   void update() {
     switch (state) {
     case NEW:
@@ -88,6 +90,8 @@ public:
   }
 };
 
+unsigned int Process::nextId = 0;
+
 class SchedulerSimulator {
 protected:
   std::deque<Process*> newProcess;
@@ -107,6 +111,11 @@ public:
       scheduler();
       running = !allProcessCompleted();
       if (running) currentTime++;
+    }
+  }
+  void end() {
+    for (auto it = terminatedProcess.begin(); it != terminatedProcess.end(); ) {
+      (*it)->render();
     }
   }
   virtual void scheduler() = 0;
@@ -160,19 +169,19 @@ public:
   }
   
   bool allProcessCompleted() override {
-    return runProcess == NULL;
+    return readyProcess.empty();
   }
 };
 
 int
 main(int argc, char *argv[]) {
   SchedulerSimulator* sim = new FCFSSimulator();
-  sim->addProcess(new Process(0, 0, 3));
-  sim->addProcess(new Process(1, 2, 6));
-  sim->addProcess(new Process(2, 4, 4));
-  sim->addProcess(new Process(3, 6, 5));
-  sim->addProcess(new Process(4, 8, 2));
+  sim->addProcess(new Process(0, 3));
+  sim->addProcess(new Process(2, 6));
+  sim->addProcess(new Process(4, 4));
+  sim->addProcess(new Process(6, 5));
+  sim->addProcess(new Process(8, 2));
   sim->start();
-  
+  sim->end();
   return 0;
 }
