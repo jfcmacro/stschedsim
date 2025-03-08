@@ -1,3 +1,3 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.25)
 project(stschedsim)
-add_executable(stdschedsim stdschedsim.cpp)
+add_executable(stschedsim stschedsim.cpp)
