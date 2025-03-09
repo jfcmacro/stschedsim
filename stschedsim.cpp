@@ -40,7 +40,7 @@ public:
     }
   }
 
-  void update(ProcessState newState, unsigned int currentTime) {
+ void update(ProcessState newState, unsigned int currentTime) {
     switch(state) {
     case NEW:
       if (newState == READY) {
@@ -48,13 +48,13 @@ public:
       }
       break;
     case READY:
-      if (newState == RUNNING) {
-      }
+      // if (newState == RUNNING) {
+      // }
       break;
     case RUNNING:
       switch(newState) {
-      case READY:
-	break;
+      // case READY:
+      // 	break;
       case TERMINATED:
 	terminated = currentTime;
       }
@@ -73,6 +73,7 @@ public:
 	      << " service: " << service
 	      << " execute: " << execute
 	      << " waiting: " << waiting
+	      << " turnaround: " << (service + waiting)
 	      << " terminated: " << terminated
 	      << std::endl;
   }
@@ -88,6 +89,10 @@ public:
   unsigned int getExecutedTime() const {
     return execute;
   }
+
+  unsigned int getTurnaroundTime() const {
+    return service + waiting;
+  }
 };
 
 unsigned int Process::nextId = 0;
@@ -100,7 +105,7 @@ protected:
   bool running;
   unsigned int currentTime;
 public:
-  SchedulerSimulator() : running(false), runProcess(NULL) { }
+  SchedulerSimulator() : running(false), runProcess(nullptr) { }
   void addProcess(Process* process) {
     newProcess.push_back(process);
   }
@@ -109,6 +114,7 @@ public:
     currentTime = 0;
     while(running) {
       scheduler();
+      if (!runProcess) break;
       running = !allProcessCompleted();
       if (running) currentTime++;
     }
@@ -116,6 +122,7 @@ public:
   void end() {
     for (auto it = terminatedProcess.begin(); it != terminatedProcess.end(); ) {
       (*it)->render();
+      it++;
     }
   }
   virtual void scheduler() = 0;
@@ -128,60 +135,71 @@ private:
 public:
   FCFSSimulator() : SchedulerSimulator() { }
   void scheduler() override {
-    // Check if a New Process has just arrived
-    Process* arrivedProcess = NULL;
+    // Check if newer processes have just arrived
     int i = 0;
     for (auto it = newProcess.begin(); it != newProcess.end();i++) {
+
+      if (!(*it)) break;
       if ((*it)->getArriveTime() == currentTime) {
-	arrivedProcess = *it;
-	// it = it.erase(it);
+	(*it)->update(READY, currentTime);
+	readyProcess.push_back(*it);
 	newProcess.erase(newProcess.begin() + i);
-	break;
+      }	
+      it++;
+    }
+
+    if (!runProcess) { // There is not running process, we must choose the first one
+
+      if (readyProcess.size() > 0) {
+	runProcess = readyProcess.front();
+	readyProcess.pop_front();
+	runProcess->update(RUNNING, currentTime);
       }
-      else {
-	it++;
+    }
+    else {
+
+      // If a running process we check it that process has already terminated, first
+      // update its statistics and then check if already ended.
+      runProcess->update();
+      
+      if ((runProcess->getServiceTime() - runProcess->getExecutedTime()) == 0) {
+	
+	runProcess->update(TERMINATED, currentTime);
+	terminatedProcess.push_back(runProcess);
+	runProcess = nullptr;
+	if (readyProcess.size() > 0) {
+	  runProcess = readyProcess.front();
+	  readyProcess.pop_front();
+	  runProcess->update(RUNNING, currentTime);
+	}
       }
     }
 
-    if (arrivedProcess) {
-      arrivedProcess->update(READY, currentTime);
-      readyProcess.push_back(arrivedProcess);
-    }
-    // if there is possible to commute to new process
-    if (!runProcess) {
-      runProcess = readyProcess.front();
-      readyProcess.pop_front();
-    }
-    else {
-      runProcess->update();
-      if ((runProcess->getServiceTime() - runProcess->getExecutedTime()) == 0) {
-	runProcess->update(TERMINATED, currentTime);
-	terminatedProcess.push_back(runProcess);
-	runProcess = readyProcess.front();
-	runProcess->update(RUNNING, currentTime);
-	readyProcess.pop_front();
-      }
-    }
     // UpdateWaitingProcess
     for (auto& process : readyProcess) {
       process->update();
     }
   }
-  
+
   bool allProcessCompleted() override {
-    return readyProcess.empty();
+    // return newProcess.size() == 0 and
+    //   readyProcess.size() == 0;
+    return runProcess == nullptr;
   }
 };
 
 int
 main(int argc, char *argv[]) {
-  SchedulerSimulator* sim = new FCFSSimulator();
+  SchedulerSimulator* sim {new FCFSSimulator()};
+
   sim->addProcess(new Process(0, 3));
   sim->addProcess(new Process(2, 6));
   sim->addProcess(new Process(4, 4));
   sim->addProcess(new Process(6, 5));
   sim->addProcess(new Process(8, 2));
+
   sim->start();
   sim->end();
+
   return 0;
 }
