@@ -1,8 +1,9 @@
-#include <iostream>
-#include <deque>
-#include <memory>
+// #include <iostream>
+// #include <deque>
+// #include <memory>
 #include <process.hpp>
 #include <scheduler.hpp>
+#include <fcfssched.hpp>
 
 int
 main(int argc, char *argv[]) {
