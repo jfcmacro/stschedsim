@@ -3,11 +3,13 @@
 // #include <memory>
 #include <process.hpp>
 #include <scheduler.hpp>
-#include <fcfssched.hpp>
+#include <rrsched.hpp>
+// #include <fcfssched.hpp>
+
 
 int
 main(int argc, char *argv[]) {
-  SchedulerSimulator* sim {new FCFSSimulator()};
+  SchedulerSimulator* sim {new RRSimulator(6)};
 
   sim->addProcess(new Process(0, 3));
   sim->addProcess(new Process(2, 6));
