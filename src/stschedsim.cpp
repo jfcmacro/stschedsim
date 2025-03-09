@@ -1,8 +1,8 @@
 #include <iostream>
 #include <deque>
 #include <memory>
-#include <process.h>
-#include <scheduler.h>
+#include <process.hpp>
+#include <scheduler.hpp>
 
 int
 main(int argc, char *argv[]) {
