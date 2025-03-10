@@ -1,15 +1,15 @@
-// #include <iostream>
-// #include <deque>
-// #include <memory>
 #include <process.hpp>
 #include <scheduler.hpp>
+#include <fcfssched.hpp>
 #include <rrsched.hpp>
-// #include <fcfssched.hpp>
+#include <getopt.h>
+
 
 
 int
-main(int argc, char *argv[]) {
-  SchedulerSimulator* sim {new RRSimulator(6)};
+main(int argc, const char *argv[]) {
+  
+  SchedulerSimulator* sim {new RRSimulator(1)};
 
   sim->addProcess(new Process(0, 3));
   sim->addProcess(new Process(2, 6));

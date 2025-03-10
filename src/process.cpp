@@ -7,7 +7,6 @@ Process::Process(unsigned int arrive,
     arrive(arrive),
     service(service),
     execute(0),
-      //    start(0),
     waiting(0),
     state(NEW) {
 }
@@ -59,7 +58,7 @@ Process::render() {
 	    << " service: " << service
 	    << " execute: " << execute
 	    << " waiting: " << waiting
-	    << " turnaround: " << (service + waiting)
+	    << " turnaround: " << getTurnaroundTime()
 	    << " terminated: " << terminated
 	    << std::endl;
 }
@@ -82,6 +81,11 @@ Process::getExecutedTime() const {
 unsigned int
 Process::getTurnaroundTime() const {
   return service + waiting;
+}
+
+unsigned int
+Process::getRemainingServiceTime() const {
+  return service - execute;
 }
 
 unsigned int Process::nextId = 0;

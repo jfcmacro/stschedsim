@@ -36,7 +36,7 @@ RRSimulator::scheduler() {
       
       runProcess->update();
       
-      if ((runProcess->getServiceTime() - runProcess->getExecutedTime()) == 0) {
+      if (runProcess->getRemainingServiceTime() == 0) {
 	
 	runProcess->update(TERMINATED, currentTime);
 	terminatedProcess.push_back(runProcess);
@@ -49,7 +49,7 @@ RRSimulator::scheduler() {
 	runProcess = nullptr;
       }
 
-      if (!runProcess) {
+      if (runProcess == nullptr) {
       
 	if (readyProcess.size() > 0) {
 	
