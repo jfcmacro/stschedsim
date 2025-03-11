@@ -64,6 +64,11 @@ Process::render() {
 }
 
 unsigned int
+Process::getId() const {
+  return id;
+}
+
+unsigned int
 Process::getArriveTime() const {
   return arrive;
 }

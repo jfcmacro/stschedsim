@@ -1,4 +1,5 @@
 #include <scheduler.hpp>
+#include <algorithm>
 
 SchedulerSimulator::SchedulerSimulator()
   : running(false), runProcess(nullptr) {
@@ -32,8 +33,11 @@ SchedulerSimulator::start() {
 void
 SchedulerSimulator::end() {
 
+  std::sort(terminatedProcess.begin(),terminatedProcess.end(),
+	    [](Process* pa, Process* pb) { return pa->getId() < pb->getId(); });
+  
   for (auto it = terminatedProcess.begin(); it != terminatedProcess.end(); ) {
-
+    
     (*it)->render();
     it++;
   }

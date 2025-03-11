@@ -4,8 +4,6 @@
 #include <rrsched.hpp>
 #include <getopt.h>
 
-
-
 int
 main(int argc, const char *argv[]) {
   

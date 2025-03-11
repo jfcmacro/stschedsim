@@ -15,9 +15,12 @@ private:
 public:
   Process(unsigned int arrive,
 	  unsigned int service);
+  
   void update();
   void update(ProcessState newState, unsigned int currentTime);
   void render();
+
+  unsigned int getId() const;
   unsigned int getArriveTime() const;
 
   unsigned int getServiceTime() const;
