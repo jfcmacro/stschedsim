@@ -8,16 +8,22 @@
 #include <fcfssched.hpp>
 #include <rrsched.hpp>
 #include <getopt.h>
+#include <stdlib.h>
 
 void loadProcess(SchedulerSimulator&, const char *);
+void usage(std::filesystem::path&);
 
 int
 main(int argc, const char *argv[]) {
 
   const char *filename;
+  std::filesystem::path progname {argv[0]};
   
   if (argc == 2) {
     filename = argv[1];
+  }
+  else {
+    usage(progname);
   }
   
   SchedulerSimulator* sim {getSchedulerAlgorithm(RR)};
@@ -71,9 +77,22 @@ loadProcess(SchedulerSimulator& sim, const char *processFilename) {
     }
   }
   else {
-    std::cerr << "File: " << processFilename << " doesn't exist" << std::endl;
-    std::cerr << "Current directory: " << std::filesystem::current_path() << std::endl;
+    std::cerr << "File: "
+	      << processFilename
+	      << " doesn't exist" << std::endl;
+    std::cerr << "Current directory: "
+	      << std::filesystem::current_path()
+	      << std::endl;
   }
   
   file.close();
+}
+
+void
+usage(std::filesystem::path& progname) {
+  std::cerr << "Usage: "
+	    << progname.filename().c_str()
+	    << " <process_scheduler_filename>"
+	    << std::endl;
+  _Exit(EXIT_FAILURE);
 }
