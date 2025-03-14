@@ -9,7 +9,8 @@ enum SchedulerAlgorithm {
   SPN,
   SRT,
   HRRN,
-  Feedback };
+  FEEDBACK,
+  SCHED_ALGO_UNKNOWN};
 
 class SchedulerSimulator {
 private:

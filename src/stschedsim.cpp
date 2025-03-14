@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <locale>
+#include <algorithm>
 #include <process.hpp>
 #include <scheduler.hpp>
 #include <fcfssched.hpp>
@@ -10,12 +12,14 @@
 #include <getopt.h>
 #include <stdlib.h>
 
-void loadProcess(SchedulerSimulator&, const char *);
+void loadProcess(SchedulerSimulator&, std::filesystem::path&);
 void usage(std::filesystem::path&);
+SchedulerAlgorithm getSchedulerAlgorithm(std::string&);
 
 int
 main(int argc, const char *argv[]) {
 
+  
   const char *filename;
   std::filesystem::path progname {argv[0]};
   
@@ -28,7 +32,9 @@ main(int argc, const char *argv[]) {
   
   SchedulerSimulator* sim {getSchedulerAlgorithm(RR)};
 
-  loadProcess(*sim, filename);
+  std::filesystem::path schedulerFile { filename };
+
+  loadProcess(*sim, schedulerFile);
 
   sim->start();
   sim->end();
@@ -51,7 +57,7 @@ getSchedulerAlgorithm(SchedulerAlgorithm schedAlg) {
   case SPN:
   case SRT:
   case HRRN:
-  case Feedback:
+  case FEEDBACK:
   default:
     ret = nullptr;
     break;
@@ -60,13 +66,27 @@ getSchedulerAlgorithm(SchedulerAlgorithm schedAlg) {
   return ret;
 }
 
-void
-loadProcess(SchedulerSimulator& sim, const char *processFilename) {
-  std::string filename { processFilename };
-  std::ifstream file(filename);
-  std::string line;
+SchedulerAlgorithm
+getSchedulerAlgorithm(std::string& schedulerStr) {
+  std::string str { schedulerStr};
 
-  std::cout << "Process File: " << processFilename << std::endl;
+  // std::transform(str.begin(), str.end(), str.begin(), std::tolower);
+  std::for_each(str.begin(), str.end(), [](char& c) { c = std::tolower(c); });
+
+  if (str == "fcfs") return SchedulerAlgorithm::FCFS;
+  if (str == "rr") return SchedulerAlgorithm::RR;
+  if (str == "spn") return SchedulerAlgorithm::SPN;
+  if (str == "srt") return SchedulerAlgorithm::SRT;
+  if (str == "hrrn") return SchedulerAlgorithm::HRRN;
+  if (str == "feedback") return SchedulerAlgorithm::FEEDBACK;
+  return SchedulerAlgorithm::SCHED_ALGO_UNKNOWN;
+}
+
+void
+loadProcess(SchedulerSimulator& sim,
+	    std::filesystem::path& schedulerFile) {
+  std::ifstream file(schedulerFile);
+  std::string line;
 
   if (file.is_open()) {
     while (std::getline(file, line)) {
@@ -77,8 +97,8 @@ loadProcess(SchedulerSimulator& sim, const char *processFilename) {
     }
   }
   else {
-    std::cerr << "File: "
-	      << processFilename
+    std::cerr << "Scheduler File: "
+	      << schedulerFile
 	      << " doesn't exist" << std::endl;
     std::cerr << "Current directory: "
 	      << std::filesystem::current_path()
