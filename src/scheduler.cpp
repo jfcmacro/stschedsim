@@ -42,3 +42,14 @@ SchedulerSimulator::end() {
     it++;
   }
 }
+
+
+unsigned int SchedulerSimulator::quantum = 1;
+
+unsigned int SchedulerSimulator::getQuantum() {
+  return SchedulerSimulator::quantum;
+}
+
+void SchedulerSimulator::setQuantum(unsigned int quantum) {
+  SchedulerSimulator::quantum = quantum;
+}

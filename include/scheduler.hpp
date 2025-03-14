@@ -3,7 +3,17 @@
 #include <memory>
 #include <process.hpp>
 
+enum SchedulerAlgorithm {
+  FCFS,
+  RR,
+  SPN,
+  SRT,
+  HRRN,
+  Feedback };
+
 class SchedulerSimulator {
+private:
+  static unsigned int quantum;
 protected:
   std::deque<Process*> newProcess;
   Process* runProcess;
@@ -17,5 +27,9 @@ public:
   void end();
   virtual void scheduler() = 0;
   virtual bool allProcessCompleted() = 0;
+  static unsigned int getQuantum();
+  static void setQuantum(unsigned int quantum);
 };
 
+SchedulerSimulator*
+getSchedulerAlgorithm(SchedulerAlgorithm);
