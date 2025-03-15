@@ -9,6 +9,7 @@
 #include <scheduler.hpp>
 #include <fcfssched.hpp>
 #include <rrsched.hpp>
+b#include <spnsched.hpp>
 #include <getopt.h>
 #include <stdlib.h>
 
@@ -99,6 +100,9 @@ getSchedulerAlgorithm(SchedulerAlgorithm schedAlg) {
     break;
 
   case SPN:
+    ret = new SPNSimulator();
+    break;
+    
   case SRT:
   case HRRN:
   case FEEDBACK:
