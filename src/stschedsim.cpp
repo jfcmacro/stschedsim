@@ -46,13 +46,16 @@ main(int argc, char* const argv[]) {
       }
       
       break;
-    case 'p':
+      
+    case 'q':
       SchedulerSimulator::setQuantum(std::stoul(optarg));
       isSetQuantum = true;
+      
       break;
 
     case '?':
       usage(progname);
+      
       break;
     }
   }
@@ -63,13 +66,15 @@ main(int argc, char* const argv[]) {
   }
 
   if (optind == argc) {
+    
     usage(progname);
   }
   else {
+    
     filename = argv[optind];
   }
   
-  SchedulerSimulator* sim {getSchedulerAlgorithm(RR)};
+  SchedulerSimulator* sim { getSchedulerAlgorithm(schedAlgo) };
 
   std::filesystem::path schedulerFile { filename };
 
