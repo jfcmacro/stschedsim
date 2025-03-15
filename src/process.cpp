@@ -84,6 +84,11 @@ Process::getExecutedTime() const {
 }
 
 unsigned int
+Process::getWaitingTime() const {
+  return waiting;
+}
+
+unsigned int
 Process::getTurnaroundTime() const {
   return service + waiting;
 }

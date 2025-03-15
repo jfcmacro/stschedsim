@@ -11,6 +11,7 @@
 #include <rrsched.hpp>
 #include <spnsched.hpp>
 #include <srtsched.hpp>
+#include <hrrnsched.hpp>
 #include <getopt.h>
 #include <stdlib.h>
 
@@ -109,6 +110,9 @@ getSchedulerAlgorithm(SchedulerAlgorithm schedAlg) {
     break;
 
   case HRRN:
+    ret = new HRRNSimulator();
+    break;
+    
   case FEEDBACK:
   default:
     ret = nullptr;

@@ -26,6 +26,7 @@ public:
   unsigned int getServiceTime() const;
   unsigned int getExecutedTime() const;
 
+  unsigned int getWaitingTime() const;
   unsigned int getTurnaroundTime() const;
   unsigned int getRemainingServiceTime() const;
 };
