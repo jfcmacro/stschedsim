@@ -14,20 +14,59 @@
 
 void loadProcess(SchedulerSimulator&, std::filesystem::path&);
 void usage(std::filesystem::path&);
-SchedulerAlgorithm getSchedulerAlgorithm(std::string&);
+SchedulerAlgorithm getSchedulerAlgorithm(const char*);
 
 int
-main(int argc, const char *argv[]) {
+main(int argc, char* const argv[]) {
 
   
   const char *filename;
   std::filesystem::path progname {argv[0]};
-  
-  if (argc == 2) {
-    filename = argv[1];
+
+  static struct option long_options[] = {
+    {"sched",   required_argument, 0, 's'},
+    {"quantum", required_argument, 0, 'q'},
+    {0,         0,                 0,  0 }
+  };
+
+  int long_index = 0;
+  int opt;
+  SchedulerAlgorithm schedAlgo = SchedulerAlgorithm::RR;
+  bool isSetQuantum = false;
+
+  while ((opt = getopt_long(argc, argv, "s:q:",
+			    long_options, &long_index)) != -1) {
+    switch(opt) {
+    case 's':
+      schedAlgo = getSchedulerAlgorithm(optarg);
+      
+      if (schedAlgo == SchedulerAlgorithm::SCHED_ALGO_UNKNOWN) {
+	
+	usage(progname);
+      }
+      
+      break;
+    case 'p':
+      SchedulerSimulator::setQuantum(std::stoul(optarg));
+      isSetQuantum = true;
+      break;
+
+    case '?':
+      usage(progname);
+      break;
+    }
+  }
+
+  if (schedAlgo != SchedulerAlgorithm::RR and
+      isSetQuantum) {
+    usage(progname);
+  }
+
+  if (optind == argc) {
+    usage(progname);
   }
   else {
-    usage(progname);
+    filename = argv[optind];
   }
   
   SchedulerSimulator* sim {getSchedulerAlgorithm(RR)};
@@ -35,7 +74,7 @@ main(int argc, const char *argv[]) {
   std::filesystem::path schedulerFile { filename };
 
   loadProcess(*sim, schedulerFile);
-
+  
   sim->start();
   sim->end();
 
@@ -67,18 +106,18 @@ getSchedulerAlgorithm(SchedulerAlgorithm schedAlg) {
 }
 
 SchedulerAlgorithm
-getSchedulerAlgorithm(std::string& schedulerStr) {
-  std::string str { schedulerStr};
+getSchedulerAlgorithm(const char* schedulerStr) {
+  std::string str { schedulerStr };
 
-  // std::transform(str.begin(), str.end(), str.begin(), std::tolower);
   std::for_each(str.begin(), str.end(), [](char& c) { c = std::tolower(c); });
 
   if (str == "fcfs") return SchedulerAlgorithm::FCFS;
-  if (str == "rr") return SchedulerAlgorithm::RR;
-  if (str == "spn") return SchedulerAlgorithm::SPN;
-  if (str == "srt") return SchedulerAlgorithm::SRT;
+  if (str == "rr")   return SchedulerAlgorithm::RR;
+  if (str == "spn")  return SchedulerAlgorithm::SPN;
+  if (str == "srt")  return SchedulerAlgorithm::SRT;
   if (str == "hrrn") return SchedulerAlgorithm::HRRN;
-  if (str == "feedback") return SchedulerAlgorithm::FEEDBACK;
+  if (str == "fb")   return SchedulerAlgorithm::FEEDBACK;
+  
   return SchedulerAlgorithm::SCHED_ALGO_UNKNOWN;
 }
 
@@ -110,9 +149,17 @@ loadProcess(SchedulerSimulator& sim,
 
 void
 usage(std::filesystem::path& progname) {
+  const unsigned int SPACES = 5;
   std::cerr << "Usage: "
+	    << std::endl
+	    << std::string(SPACES, ' ')
 	    << progname.filename().c_str()
-	    << " <process_scheduler_filename>"
+	    << " [[-s|--sched] [fcfs|spn|srt|hrrn|fb]] <process_scheduler_filename>"
+	    << std::endl
+	    << std::string(SPACES, ' ')
+	    << progname.filename().c_str()
+	    << " [[-s|--sched] rr]] [[-q|--quantum] <quantum_value>] <process_scheduler_filename>"
 	    << std::endl;
+  
   _Exit(EXIT_FAILURE);
 }
