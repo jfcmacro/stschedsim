@@ -22,7 +22,6 @@ SchedulerAlgorithm getSchedulerAlgorithm(const char*);
 int
 main(int argc, char* const argv[]) {
 
-
   const char *filename;
   std::filesystem::path progname {argv[0]};
 
