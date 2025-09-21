@@ -10,16 +10,16 @@ HRRNSimulator::HRRNSimulator()
 void
 HRRNSimulator::scheduler() {
     // Check if newer processes have just arrived
-    int i = 0;
-    for (auto it = newProcess.begin(); it != newProcess.end();i++) {
+    for (auto it = newProcess.begin(); it != newProcess.end();) {
 
-      if (!(*it)) break;
       if ((*it)->getArriveTime() == currentTime) {
 	(*it)->update(READY, currentTime);
 	readyProcess.push_back(*it);
-	newProcess.erase(newProcess.begin() + i);
-      }	
-      it++;
+	it = newProcess.erase(it);
+      }
+      else {
+	it++;
+      }
     }
 
     if (!runProcess) { // There is not running process, we must choose the first one

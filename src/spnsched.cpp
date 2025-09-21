@@ -8,23 +8,21 @@ SPNSimulator::SPNSimulator()
 void
 SPNSimulator::scheduler() {
     // Check if newer processes have just arrived
-    int i = 0;
-    for (auto it = newProcess.begin(); it != newProcess.end();i++) {
 
-      if (!(*it)) break;
+    for (auto it = newProcess.begin(); it != newProcess.end();) {
+
       if ((*it)->getArriveTime() == currentTime) {
 	(*it)->update(READY, currentTime);
 	readyProcess.push_back(*it);
-	newProcess.erase(newProcess.begin() + i);
-      }	
-      it++;
+	it = newProcess.erase(it);
+      }	else {
+	it++;
+      }
     }
 
     if (!runProcess) { // There is not running process, we must choose the first one
 
       if (readyProcess.size() > 0) {
-	// runProcess = readyProcess.front();
-	// readyProcess.pop_front();
 	runProcess = readyProcess[0];
 	readyProcess.erase(readyProcess.begin());
 	runProcess->update(RUNNING, currentTime);
@@ -42,15 +40,13 @@ SPNSimulator::scheduler() {
 	terminatedProcess.push_back(runProcess);
 	runProcess = nullptr;
 	if (readyProcess.size() > 0) {
-	  // runProcess = readyProcess.front();
-	  // readyProcess.pop_front();
 	  std::vector<Process*>::iterator result =
 	    std::min_element(readyProcess.begin(),
 			     readyProcess.end(),
 			     [](Process* p, Process* q) {
 			       return p->getServiceTime() < q->getServiceTime();
 			     });
-	  runProcess = *result; // readyProcess[result];
+	  runProcess = *result;
 	  readyProcess.erase(result);
 	  runProcess->update(RUNNING, currentTime);
 	}

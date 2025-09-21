@@ -8,26 +8,26 @@ SRTSimulator::SRTSimulator()
 void
 SRTSimulator::scheduler() {
     // Check if newer processes have just arrived
-    int i = 0;
+
     bool atLeastOneArrived = false;
     
-    for (auto it = newProcess.begin(); it != newProcess.end();i++) {
+    for (auto it = newProcess.begin(); it != newProcess.end();) {
 
-      if (!(*it)) break;
       if ((*it)->getArriveTime() == currentTime) {
 	(*it)->update(READY, currentTime);
 	readyProcess.push_back(*it);
-	newProcess.erase(newProcess.begin() + i);
+	it = newProcess.erase(it);
 	atLeastOneArrived = true;
-      }	
-      it++;
+      }
+      else {
+	it++;
+      }
     }
 
     if (!runProcess) { // There is not running process, we must choose the first one
 
       if (readyProcess.size() > 0) {
 	runProcess = readyProcess.front();
-	// readyProcess.pop_front();
 	readyProcess.erase(readyProcess.begin());
 	runProcess->update(RUNNING, currentTime);
       }

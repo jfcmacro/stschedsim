@@ -28,6 +28,7 @@ main(int argc, char* const argv[]) {
   static struct option long_options[] = {
     {"sched",   required_argument, 0, 's'},
     {"quantum", required_argument, 0, 'q'},
+    {"help",    no_argument,       0, 'h'},
     {0,         0,                 0,  0 }
   };
 
@@ -36,7 +37,7 @@ main(int argc, char* const argv[]) {
   SchedulerAlgorithm schedAlgo = SchedulerAlgorithm::RR;
   bool isSetQuantum = false;
 
-  while ((opt = getopt_long(argc, argv, "s:q:",
+  while ((opt = getopt_long(argc, argv, "s:q:h",
 			    long_options, &long_index)) != -1) {
     switch(opt) {
     case 's':
@@ -55,6 +56,7 @@ main(int argc, char* const argv[]) {
 
       break;
 
+    case 'h':
     case '?':
       usage(progname);
 
@@ -179,6 +181,10 @@ usage(std::filesystem::path& progname) {
 	    << std::string(SPACES, ' ')
 	    << progname.filename().c_str()
 	    << " [[-s|--sched] rr]] [[-q|--quantum] <quantum_value>] <process_scheduler_filename>"
+	    << std::endl
+	    << std::string(SPACES, ' ')
+	    << progname.filename().c_str()
+	    << " [-h|--help]"
 	    << std::endl;
 
   _Exit(EXIT_FAILURE);
