@@ -8,6 +8,8 @@
 class FCFSSimulator : public SchedulerSimulator {
 private:
   std::deque<Process*> readyProcess;
+protected:
+  void receiveArrivedProcess(Process* arrivedProcess) override;
 public:
   FCFSSimulator();
   void scheduler() override;

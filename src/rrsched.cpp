@@ -5,69 +5,64 @@ RRSimulator::RRSimulator(unsigned int quatum)
 }
 
 void
-RRSimulator::scheduler() {
-    // Check if newer processes have just arrived
-  
-    for (auto it = newProcess.begin(); it != newProcess.end();) {
+RRSimulator::receiveArrivedProcess(Process* arrivedProcess) {
+  readyProcess.push_back(arrivedProcess);
+}
 
-      if ((*it)->getArriveTime() == currentTime) {
-	(*it)->update(READY, currentTime);
-	readyProcess.push_back(*it);
-	it = newProcess.erase(it);
-      }
-      else {
-	it++;
-      }
+void
+RRSimulator::scheduler() {
+  // Check if newer processes have just arrived
+  checkArrivedProcess();
+
+  if (!runProcess) { // There is not running process, we must choose the first one
+    
+    if (readyProcess.size() > 0) {
+      
+      runProcess = readyProcess.front();
+      readyProcess.pop_front();
+      runProcess->update(RUNNING, currentTime);
+      remainingQuantum = quantum;
+    }
+  }
+  else {
+
+    if (remainingQuantum > 0) {
+      remainingQuantum--;
+    }
+      
+    runProcess->update();
+      
+    if (runProcess->getRemainingServiceTime() == 0) {
+	
+      runProcess->update(TERMINATED, currentTime);
+      terminatedProcess.push_back(runProcess);
+      runProcess = nullptr;
+    }
+    else if (remainingQuantum == 0) {
+	
+      runProcess->update(READY, currentTime);
+      readyProcess.push_back(runProcess);
+      runProcess = nullptr;
     }
 
-    if (!runProcess) { // There is not running process, we must choose the first one
-
+    if (runProcess == nullptr) {
+      
       if (readyProcess.size() > 0) {
+	
 	runProcess = readyProcess.front();
 	readyProcess.pop_front();
 	runProcess->update(RUNNING, currentTime);
-	remainingQuantum = quantum;
       }
+	
+      remainingQuantum = quantum;
     }
-    else {
+  }
 
-      if (remainingQuantum > 0) {
-	remainingQuantum--;
-      }
+  // UpdateWaitingProcess
+  for (auto& process : readyProcess) {
       
-      runProcess->update();
-      
-      if (runProcess->getRemainingServiceTime() == 0) {
-	
-	runProcess->update(TERMINATED, currentTime);
-	terminatedProcess.push_back(runProcess);
-	runProcess = nullptr;
-      }
-      else if (remainingQuantum == 0) {
-	
-	runProcess->update(READY, currentTime);
-	readyProcess.push_back(runProcess);
-	runProcess = nullptr;
-      }
-
-      if (runProcess == nullptr) {
-      
-	if (readyProcess.size() > 0) {
-	
-	  runProcess = readyProcess.front();
-	  readyProcess.pop_front();
-	  runProcess->update(RUNNING, currentTime);
-	}
-	
-	remainingQuantum = quantum;
-      }
-    }
-
-    // UpdateWaitingProcess
-    for (auto& process : readyProcess) {
-      
-      process->update();
-    }
+    process->update();
+  }
 }
 
 bool

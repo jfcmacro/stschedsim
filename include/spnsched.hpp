@@ -9,6 +9,8 @@
 class SPNSimulator : public SchedulerSimulator {
 private:
   std::vector<Process*> readyProcess;
+protected:
+  void receiveArrivedProcess(Process* arrivedProcess) override;
 public:
   SPNSimulator();
   void scheduler() override;

@@ -6,6 +6,22 @@ SchedulerSimulator::SchedulerSimulator()
 }
 
 void
+SchedulerSimulator::checkArrivedProcess() {
+  for (auto it = newProcess.begin(); it != newProcess.end();) {
+
+    if ((*it)->getArriveTime() == currentTime) {
+      (*it)->update(READY, currentTime);
+      // readyProcess.push_back(*it);
+      receiveArrivedProcess(*it);
+      it = newProcess.erase(it);
+    }
+    else {
+      it++;
+    }
+  }
+}
+
+void
 SchedulerSimulator::addProcess(Process* process) {
   newProcess.push_back(process);
 }

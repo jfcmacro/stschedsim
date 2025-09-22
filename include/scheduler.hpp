@@ -21,6 +21,8 @@ protected:
   std::deque<Process*> terminatedProcess;
   bool running;
   unsigned int currentTime;
+  void checkArrivedProcess();
+  virtual void receiveArrivedProcess(Process* process) = 0;
 public:
   SchedulerSimulator();
   void addProcess(Process* process);
