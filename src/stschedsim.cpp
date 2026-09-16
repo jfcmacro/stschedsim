@@ -175,15 +175,15 @@ usage(std::filesystem::path& progname) {
   std::cerr << "Usage: "
 	    << std::endl
 	    << std::string(SPACES, ' ')
-	    << progname.filename().c_str()
+	    << progname.filename()
 	    << " [[-s|--sched] [fcfs|spn|srt|hrrn|fb]] <process_scheduler_filename>"
 	    << std::endl
 	    << std::string(SPACES, ' ')
-	    << progname.filename().c_str()
+	    << progname.filename()
 	    << " [[-s|--sched] rr]] [[-q|--quantum] <quantum_value>] <process_scheduler_filename>"
 	    << std::endl
 	    << std::string(SPACES, ' ')
-	    << progname.filename().c_str()
+	    << progname.filename()
 	    << " [-h|--help]"
 	    << std::endl;
 
